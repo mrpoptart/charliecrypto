@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Charlie's Crypto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        function handleClick(){
+            let str = document.getElementById('str').value;
+            let rot = document.getElementById('rot').value;
+            let func = document.getElementById('func').value;
+            if(str.trim() === '') {
+                alert("please enter something to encode / decode")
+            }
+            if(rot.trim() === '') {
+                alert("please enter numbers to rotate")
+            }
+            rot = rot.split('').map((num)=>{return parseInt(num)});
+            let out = 'something went wrong';
+            if(func === 'encode') {
+                out = encodeString(str, rot)
+            } else if(func === 'decode') {
+                out = decodeString(str, rot)
+            } else {
+                alert('dunno what happened');
+            }
+            let li = document.createElement('li')
+            li.innerText = out;
+            document.getElementById('output').appendChild(li)
+        }
+
+
+        let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+        function decodeOffsetLetter(letter, offset) {
+            letter = letter.toUpperCase();
+            let index = alphabet.indexOf(letter);
+            let outIndex = index - offset;
+            if(outIndex < 0) {
+                outIndex += 26
+            }
+            let outLetter = alphabet[outIndex]
+
+            return outLetter;
+        }
+        function encodeOffsetLetter(letter, offset) {
+            letter = letter.toUpperCase();
+            let index = alphabet.indexOf(letter);
+            let outIndex = index + offset;
+            if(outIndex > 25) {
+                outIndex -= 26
+            }
+            let outLetter = alphabet[outIndex]
+
+            return outLetter;
+        }
+
+        function encodeString(str, rotations) {
+            let arr = str.split('')
+            let rotation = 0;
+            let out = []
+            arr.map((letter)=>{
+                letter = letter.toUpperCase();
+                if(!!letter.match(/[A-Z]/)) {
+                    let offset = parseInt(rotations[rotation % 4]);
+                    let nextLetter = encodeOffsetLetter(letter, offset)
+                    out.push(nextLetter);
+                    rotation++;
+                } else {
+                    out.push(letter);
+                }
+            })
+            return out.join('');
+        }
+
+        function decodeString(str, rotations) {
+            let arr = str.split('')
+            let rotation = 0;
+            let out = []
+            arr.map((letter)=>{
+                letter = letter.toUpperCase();
+                if(!!letter.match(/[A-Z]/)) {
+                    let offset = parseInt(rotations[rotation % 4]);
+                    let nextLetter = decodeOffsetLetter(letter, offset)
+                    out.push(nextLetter);
+                    rotation++;
+                } else {
+                    out.push(letter);
+                }
+            })
+            return out.join('');
+        }
+    </script>
+    <style>
+        body, html {
+            background-color: #222;
+            color: #DDD;
+            display: flex;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+        .main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            max-width: 400px;
+        }
+        textarea, input, select, .btn {
+            font-size: 20px;
+            margin:0;
+            background-color: #222;
+            color: #DDD;
+            border: 1px solid #DDD;
+            padding: 5px;
+        }
+        textarea {
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <textarea id="str" placeholder="Text to encode/decode"></textarea>
+    <input id="rot" placeholder="Numbers to use"/>
+    <select id="func">
+        <option value="encode">Encode</option>
+        <option value="decode">Decode</option>
+    </select>
+    <a class="btn" onclick="handleClick()">Submit</a>
+    <ul id="output"></ul>
+</div>
+</body>
+</html>
